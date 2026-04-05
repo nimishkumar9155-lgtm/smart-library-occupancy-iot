@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dashboard — Library Seat Tracker</title>
+  <meta name="description" content="Real-time library seat occupancy dashboard. Monitor available, occupied, and booked seats instantly.">
+  <link rel="stylesheet" href="style.css">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>📚</text></svg>">
+</head>
+<body>
+
+  <nav class="navbar" id="navbar">
+    <div class="nav-brand">
+      <div class="nav-logo">📚</div>
+      <div>
+        <div class="nav-title">Library Seat Tracker</div>
+        <div class="nav-subtitle">Real-time Occupancy Dashboard</div>
+      </div>
+    </div>
+    <div class="nav-actions">
+      <div class="live-badge">
+        <span class="live-dot"></span>
+        <span id="modeLabel">DEMO MODE</span>
+      </div>
+      <button class="btn-logout" id="logoutBtn" onclick="logout()">
+        🚪 Logout
+      </button>
+    </div>
+  </nav>
+
+  <main class="dashboard-content">
+
+    <div class="stats-grid">
+      <div class="stat-card total">
+        <div class="stat-icon">🏛️</div>
+        <div class="stat-label">Total Seats</div>
+        <div class="stat-value" id="statTotal">0</div>
+        <div class="stat-change up">📊 All zones</div>
+      </div>
+      <div class="stat-card available">
+        <div class="stat-icon">✅</div>
+        <div class="stat-label">Available</div>
+        <div class="stat-value" id="statAvailable">0</div>
+        <div class="stat-change up">🟢 Ready</div>
+      </div>
+      <div class="stat-card occupied">
+        <div class="stat-icon">🔴</div>
+        <div class="stat-label">Occupied</div>
+        <div class="stat-value" id="statOccupied">0</div>
+        <div class="stat-change down">👤 In use</div>
+      </div>
+      <div class="stat-card booked">
+        <div class="stat-icon">📋</div>
+        <div class="stat-label">Booked</div>
+        <div class="stat-value" id="statBooked">0</div>
+        <div class="stat-change up">🟡 Reserved</div>
+      </div>
+    </div>
+
+    <div class="main-grid">
+
+      <div class="seats-panel">
+        <div class="section-header">
+          <h2 class="section-title">🪑 Seat Map</h2>
+          <span class="section-badge" id="lastUpdateBadge">Auto-updating</span>
+        </div>
+        <div id="seatGridContainer">
+        </div>
+      </div>
+
+      <aside class="sidebar">
+
+        <div class="chart-card">
+          <div class="section-header">
+            <h2 class="section-title">📊 Occupancy</h2>
+          </div>
+          <div class="donut-wrapper">
+            <svg class="donut-svg" viewBox="0 0 180 180">
+              <circle cx="90" cy="90" r="70" stroke="rgba(255,255,255,0.05)" />
+              <circle cx="90" cy="90" r="70" id="circleAvailable" stroke="#76FF03" stroke-dasharray="0 440" />
+              <circle cx="90" cy="90" r="70" id="circleOccupied"  stroke="#FF4081" stroke-dasharray="0 440" />
+              <circle cx="90" cy="90" r="70" id="circleBooked"    stroke="#FFAB00" stroke-dasharray="0 440" />
+            </svg>
+            <div class="donut-center">
+              <span class="donut-percent" id="donutPercent">0%</span>
+              <span class="donut-label">Occupied</span>
+            </div>
+          </div>
+          <div class="chart-legend">
+            <div class="legend-item">
+              <span class="legend-dot" style="background:#76FF03"></span> Available
+            </div>
+            <div class="legend-item">
+              <span class="legend-dot" style="background:#FF4081"></span> Occupied
+            </div>
+            <div class="legend-item">
+              <span class="legend-dot" style="background:#FFAB00"></span> Booked
+            </div>
+          </div>
+        </div>
+
+        <div class="activity-card">
+          <div class="section-header">
+            <h2 class="section-title">📝 Activity Log</h2>
+          </div>
+          <ul class="activity-list" id="activityList">
+          
+          </ul>
+        </div>
+
+      </aside>
+    </div>
+
+  </main>
+
+  
+  <footer class="dashboard-footer">
+    <p>Library Seat Occupancy Tracker &mdash; Built with <span class="heart">❤️</span> using ESP32 IoT</p>
+    <p style="margin-top: 4px;">© 2026 Nimish &bull; All rights reserved</p>
+  </footer>
+
+  <div class="toast-container" id="toastContainer"></div>
+
+  <!-- Firebase core and real-time database SDK -->
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
+
+  <script src="app.js"></script>
+  <script>
+    
+    document.addEventListener('DOMContentLoaded', function() {
+      renderDashboard();
+    });
+  </script>
+
+</body>
+</html>

@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Library Seat Tracker | College Central Library</title>
+  <meta name="description" content="Real-time library seat availability tracker for college students. Check seat status before visiting the library.">
+  <link rel="stylesheet" href="style.css">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>📚</text></svg>">
+</head>
+<body>
+
+  <!-- Floating Animated Background -->
+  <div class="floating-bg">
+    <div class="circle"></div>
+    <div class="circle"></div>
+    <div class="circle"></div>
+    <div class="circle"></div>
+    <img src="https://cdn-icons-png.flaticon.com/512/3135/3135755.png" class="student-img" alt="Walking student">
+  </div>
+
+  <!-- ===== Welcome / Login Screen ===== -->
+  <div id="welcomeScreen" class="welcome-screen">
+    <div class="welcome-container">
+
+      <!-- Left: College Branding -->
+      <div class="college-logo">
+        <div class="logo-icon-wrapper">
+          <i class="fas fa-graduation-cap"></i>
+        </div>
+        <h1>College Central Library</h1>
+        <p class="tagline">Real-time Seat Availability</p>
+
+        <div class="features-list">
+          <div class="feature-item">
+            <i class="fas fa-bolt"></i>
+            <span>Live seat updates from sensors</span>
+          </div>
+          <div class="feature-item">
+            <i class="fas fa-map-marker-alt"></i>
+            <span>Floor-wise seat map</span>
+          </div>
+          <div class="feature-item">
+            <i class="fas fa-bell"></i>
+            <span>Know before you go</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Right: Login Card -->
+      <div class="login-card" id="loginCard">
+        <h2>👋 Quick Access</h2>
+        <p class="card-subtitle">Enter as Student to view live seats</p>
+
+        <form id="loginForm" onsubmit="return handleLogin(event)">
+          <div class="input-wrapper">
+            <input type="text" id="studentId" placeholder="Student ID / Roll No" required autocomplete="username">
+            <i class="fas fa-id-card input-icon"></i>
+          </div>
+
+          <div class="input-wrapper">
+            <input type="password" id="password" placeholder="Password (optional)" autocomplete="current-password">
+            <i class="fas fa-lock input-icon"></i>
+          </div>
+
+          <button type="submit" class="enter-btn" id="loginBtn">
+            <span class="btn-text">Enter Library</span>
+            <i class="fas fa-door-open"></i>
+          </button>
+        </form>
+
+        <div class="demo-info">
+          <small>👨‍🎓 Demo: Type anything and press Enter</small>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ===== Main Dashboard ===== -->
+  <div id="mainDashboard" class="dashboard hidden">
+
+    <!-- Top Bar -->
+    <div class="top-bar">
+      <div class="library-info">
+        <i class="fas fa-book-open"></i>
+        <span>Central Library — Floor 1</span>
+      </div>
+      <div class="status-container">
+        <div class="live-indicator">
+          <div class="live-dot"></div>
+          <span id="modeLabel">LIVE</span>
+        </div>
+        <button id="refreshBtn" class="refresh-btn" onclick="refreshData()">
+          <i class="fas fa-sync-alt"></i>
+        </button>
+      </div>
+    </div>
+
+    <!-- Stats Cards -->
+    <div class="stats-row">
+      <div class="stat-card green">
+        <div class="stat-icon"><i class="fas fa-chair"></i></div>
+        <div class="stat-number" id="availableSeats">0</div>
+        <div class="stat-label">Seats Free</div>
+        <div class="stat-trend up" id="trendFree">
+          <i class="fas fa-arrow-up"></i> <span>Ready</span>
+        </div>
+      </div>
+      <div class="stat-card orange">
+        <div class="stat-icon"><i class="fas fa-user"></i></div>
+        <div class="stat-number" id="occupiedSeats">0</div>
+        <div class="stat-label">Seats Taken</div>
+        <div class="stat-trend up" id="trendTaken">
+          <i class="fas fa-arrow-up"></i> <span>In use</span>
+        </div>
+      </div>
+      <div class="stat-card total">
+        <div class="stat-icon"><i class="fas fa-building"></i></div>
+        <div class="stat-number" id="totalSeats">0</div>
+        <div class="stat-label">Total Seats</div>
+        <div class="stat-trend up">
+          <i class="fas fa-chart-bar"></i> <span>All zones</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Library Floor Map -->
+    <div class="library-section">
+      <div class="section-header">
+        <h2><i class="fas fa-map-marked-alt"></i> Library Floor Map</h2>
+        <div class="map-legend">
+          <span class="legend-free"><i class="fas fa-chair"></i> Free</span>
+          <span class="legend-busy"><i class="fas fa-user"></i> Occupied</span>
+        </div>
+      </div>
+      <div class="library-map" id="seatMap">
+        <!-- Rendered by JS -->
+      </div>
+    </div>
+
+    <!-- Info Cards -->
+    <div class="info-cards">
+      <div class="info-card">
+        <div class="card-icon"><i class="fas fa-clock"></i></div>
+        <div>
+          <h3>Open 24/7</h3>
+          <p>Library open all night during exams</p>
+        </div>
+      </div>
+      <div class="info-card">
+        <div class="card-icon"><i class="fas fa-wifi"></i></div>
+        <div>
+          <h3>Free WiFi</h3>
+          <p>Library_WiFi | Pass: studyhard</p>
+        </div>
+      </div>
+      <div class="info-card">
+        <div class="card-icon"><i class="fas fa-plug"></i></div>
+        <div>
+          <h3>Charging Points</h3>
+          <p>Available at every seat</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Activity Log -->
+    <div class="activity-section">
+      <div class="section-header">
+        <h2><i class="fas fa-stream"></i> Recent Activity</h2>
+        <div class="map-legend">
+          <span style="color: var(--text-muted); font-weight: 500; font-size: 0.85rem;">Auto-updating every 5s</span>
+        </div>
+      </div>
+      <div class="activity-panel">
+        <ul class="activity-list" id="activityList">
+          <!-- Rendered by JS -->
+        </ul>
+      </div>
+    </div>
+
+    <!-- Bottom Bar -->
+    <div class="bottom-bar">
+      <button id="backBtn" class="back-btn" onclick="goBackToWelcome()">
+        <i class="fas fa-arrow-left"></i> Back to Welcome
+      </button>
+      <div class="credit">
+        Made with <span class="heart">❤️</span> for students | Data updates every 5 seconds
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast Container -->
+  <div class="toast-container" id="toastContainer"></div>
+
+  <!-- Firebase core and real-time database SDK -->
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
+
+  <script src="app.js"></script>
+
+</body>
+</html>
