@@ -1,5 +1,6 @@
 #include <WiFi.h>
 #include <HTTPClient.h>
+#include <WiFiClientSecure.h>
 
 #define trigPin 5
 #define echoPin 18
@@ -18,8 +19,12 @@ bool firstRun = true;
 
 void sendToFirebase(String status) {
   if (WiFi.status() == WL_CONNECTED) {
+    // Firebase uses HTTPS, so you MUST use WiFiClientSecure and bypass the SSL certificate
+    WiFiClientSecure client;
+    client.setInsecure(); 
+    
     HTTPClient http;
-    http.begin(firebaseURL); 
+    http.begin(client, firebaseURL); 
     http.addHeader("Content-Type", "application/json");
 
     // The REST API expects the data formatted as JSON. 
@@ -27,14 +32,20 @@ void sendToFirebase(String status) {
 
     int httpResponseCode = http.PUT(payload);
 
-    if (httpResponseCode > 0) {
-      Serial.print("Firebase updated (");
+    if (httpResponseCode == 200) {
+      Serial.print("✅ Firebase updated (");
       Serial.print(status);
-      Serial.print(") HTTP: ");
-      Serial.println(httpResponseCode);
+      Serial.println(") HTTP 200 OK");
     } else {
-      Serial.print("Firebase error: ");
+      Serial.print("❌ Firebase error: HTTP ");
       Serial.println(httpResponseCode);
+      if (httpResponseCode == 401 || httpResponseCode == 403) {
+        Serial.println("-> PERMISSION DENIED! Change Firebase Realtime DB Rules to true.");
+      } else if (httpResponseCode == 404) {
+        Serial.println("-> NOT FOUND! Your Firebase Database URL is completely wrong or the database hasn't been created yet!");
+      } else if (httpResponseCode < 0) {
+         Serial.println("-> CONNECTION FAILED! Please check WiFi or SSL.");
+      }
     }
     http.end();
   } else {

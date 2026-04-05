@@ -1,0 +1,14 @@
+{
+  "hosting": {
+    "public": ".",
+    "ignore": [
+      "firebase.json",
+      "**/.*",
+      "**/node_modules/**",
+      "**/*.cpp",
+      "**/*.ino",
+      "**/*.md",
+      "Library_Seat_ESP32/**"
+    ]
+  }
+}
